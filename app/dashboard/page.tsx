@@ -176,7 +176,6 @@
 //   return null
 // }
 
-
 "use client"
 
 import { useUser } from "@clerk/nextjs"
@@ -193,35 +192,40 @@ export default function Dashboard(){
     if(!isLoaded) return
     if(!user) return
 
-    const setup = async()=>{
+    const routeUser = async()=>{
 
-      // 🔥 CREATE USER IN SUPABASE
-      await fetch("/api/create-user",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          clerk_id:user.id,
-          email:user.primaryEmailAddress?.emailAddress,
-          name:user.fullName
-        })
-      })
+      // 🔥 STEP 1: check superadmin from Clerk metadata
+      const clerkRole = user.publicMetadata?.role
 
-      // 🔥 GET USER ROLE FROM DB
+      if(clerkRole === "superadmin"){
+        router.push("/superadmin")
+        return
+      }
+
+      // 🔥 STEP 2: check role from Supabase for others
       const { data:userData } = await supabase
         .from("users")
         .select("*")
         .eq("clerk_id", user.id)
         .single()
 
-      if(!userData) return
+      if(!userData){
+        // create default resident if not exists
+        await supabase.from("users").insert([{
+          clerk_id:user.id,
+          email:user.primaryEmailAddress?.emailAddress,
+          name:user.fullName,
+          role:"resident",
+          tenant_id:"demo1"
+        }])
+
+        router.push("/resident")
+        return
+      }
 
       const role = userData.role
 
-      // 🔀 ROUTE BASED ON ROLE
-      if(role==="superadmin"){
-        router.push("/superadmin")
-      }
-      else if(role==="admin"){
+      if(role==="admin"){
         router.push("/admin")
       }
       else if(role==="staff"){
@@ -232,12 +236,12 @@ export default function Dashboard(){
       }
     }
 
-    setup()
+    routeUser()
   },[user,isLoaded])
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      Loading...
+    <div className="h-screen flex items-center justify-center text-xl">
+      Loading dashboard...
     </div>
   )
 }
