@@ -100,10 +100,87 @@
 
 
 
+// "use client"
+
+// import { useUser } from "@clerk/nextjs"
+// import { useEffect, useState } from "react"
+// import { supabase } from "@/lib/supabase"
+// import { useRouter } from "next/navigation"
+
+// export default function Dashboard(){
+
+//   const { user, isLoaded } = useUser()
+//   const router = useRouter()
+
+//   const [loading,setLoading]=useState(true)
+
+//   useEffect(()=>{
+//     if(!isLoaded) return
+//     if(!user) return
+
+//     const setup = async()=>{
+
+//       // 🔥 create user automatically if not exists
+//       await fetch("/api/create-user",{
+//         method:"POST",
+//         headers:{"Content-Type":"application/json"},
+//         body:JSON.stringify({
+//           clerk_id:user.id,
+//           email:user.primaryEmailAddress?.emailAddress,
+//           name:user.fullName
+//         })
+//       })
+
+//       // get role from database
+//       const { data:userData } = await supabase
+//         .from("users")
+//         .select("*")
+//         .eq("clerk_id", user.id)
+//         .single()
+
+//       if(!userData){
+//         setLoading(false)
+//         return
+//       }
+
+//       const role = userData.role
+
+//       // 🔀 role-based routing
+//       if(role==="admin"){
+//         router.push("/admin")
+//       }
+//       else if(role==="staff"){
+//         router.push("/staff")
+//       }
+//       else if(role==="superadmin"){
+//         router.push("/superadmin")
+//       }
+//       else{
+//         router.push("/resident")
+//       }
+
+//       setLoading(false)
+//     }
+
+//     setup()
+//   },[user,isLoaded])
+
+//   if(!isLoaded || loading){
+//     return(
+//       <div className="h-screen flex items-center justify-center text-xl">
+//         Loading dashboard...
+//       </div>
+//     )
+//   }
+
+//   return null
+// }
+
+
 "use client"
 
 import { useUser } from "@clerk/nextjs"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -112,15 +189,13 @@ export default function Dashboard(){
   const { user, isLoaded } = useUser()
   const router = useRouter()
 
-  const [loading,setLoading]=useState(true)
-
   useEffect(()=>{
     if(!isLoaded) return
     if(!user) return
 
     const setup = async()=>{
 
-      // 🔥 create user automatically if not exists
+      // 🔥 CREATE USER IN SUPABASE
       await fetch("/api/create-user",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -131,47 +206,38 @@ export default function Dashboard(){
         })
       })
 
-      // get role from database
+      // 🔥 GET USER ROLE FROM DB
       const { data:userData } = await supabase
         .from("users")
         .select("*")
         .eq("clerk_id", user.id)
         .single()
 
-      if(!userData){
-        setLoading(false)
-        return
-      }
+      if(!userData) return
 
       const role = userData.role
 
-      // 🔀 role-based routing
-      if(role==="admin"){
+      // 🔀 ROUTE BASED ON ROLE
+      if(role==="superadmin"){
+        router.push("/superadmin")
+      }
+      else if(role==="admin"){
         router.push("/admin")
       }
       else if(role==="staff"){
         router.push("/staff")
       }
-      else if(role==="superadmin"){
-        router.push("/superadmin")
-      }
       else{
         router.push("/resident")
       }
-
-      setLoading(false)
     }
 
     setup()
   },[user,isLoaded])
 
-  if(!isLoaded || loading){
-    return(
-      <div className="h-screen flex items-center justify-center text-xl">
-        Loading dashboard...
-      </div>
-    )
-  }
-
-  return null
+  return (
+    <div className="h-screen flex items-center justify-center">
+      Loading...
+    </div>
+  )
 }
