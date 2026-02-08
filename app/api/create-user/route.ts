@@ -22,7 +22,7 @@ export async function POST(req:Request){
   }
 
   // default tenant (change later)
-  const defaultTenant = "demo-tenant-id"
+  const defaultTenant = "b8329d58-356d-4c46-a4be-e18a032892d2"
 
   await supabase.from("users").insert([{
     clerk_id,
