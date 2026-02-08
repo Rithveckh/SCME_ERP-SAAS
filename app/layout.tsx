@@ -26,8 +26,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
     <html lang="en">
-      <body>
-        {children}
+      <body className="bg-gray-100">
+        <div className="min-h-screen w-full max-w-[1400px] mx-auto">
+          {children}
+        </div>
       </body>
     </html>
     </ClerkProvider>
