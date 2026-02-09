@@ -1024,27 +1024,27 @@ export default function AdminDashboard(){
   return(
     <div>
 
-      <h1 className="text-3xl font-bold mb-6">🚀 Industry 5.0 Smart Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">🚀 Smart Admin Dashboard</h1>
 
       {/* stat cards */}
       <div className="grid grid-cols-4 gap-6 mb-10">
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow text-gray-900">
           <p className="text-gray-500">Residents</p>
           <p className="text-3xl font-bold">{stats.residents}</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow text-gray-900">
           <p className="text-gray-500">Staff</p>
           <p className="text-3xl font-bold">{stats.staff}</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow text-gray-900">
           <p className="text-gray-500">Complaints</p>
           <p className="text-3xl font-bold">{stats.complaints}</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow text-gray-900">
           <p className="text-gray-500">Revenue</p>
           <p className="text-3xl font-bold text-green-600">₹ {stats.revenue}</p>
         </div>
@@ -1054,7 +1054,7 @@ export default function AdminDashboard(){
       {/* charts */}
       <div className="grid grid-cols-2 gap-8">
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow text-gray-900">
           <h2 className="font-bold mb-4">Complaint Status</h2>
 
           <ResponsiveContainer width="100%" height={300}>
@@ -1068,7 +1068,7 @@ export default function AdminDashboard(){
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow text-gray-900">
           <h2 className="font-bold mb-4">Monthly Revenue</h2>
 
           <ResponsiveContainer width="100%" height={300}>
@@ -1085,7 +1085,7 @@ export default function AdminDashboard(){
       </div>
 
       {/* predictive AI */}
-      <div className="bg-white p-6 rounded-xl shadow mt-10">
+      <div className="bg-white p-6 rounded-xl shadow mt-10 text-gray-900">
         <h2 className="text-xl font-bold mb-4">🤖 Predictive Maintenance AI</h2>
 
         {aiInsights.map((i,index)=>(

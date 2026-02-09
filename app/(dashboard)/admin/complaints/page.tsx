@@ -62,10 +62,10 @@ export default function AdminComplaints() {
 
   return (
     <div className="p-10">
-      <h1 className="text-3xl font-bold mb-6">Admin Complaint Panel</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">Admin Complaint Panel</h1>
 
       {complaints.map(c=>(
-        <div key={c.id} className="border p-4 mb-4 rounded shadow">
+        <div key={c.id} className="border p-4 mb-4 rounded shadow text-gray-900">
 
           <p><b>Category:</b> {c.category}</p>
           <p><b>Description:</b> {c.description}</p>

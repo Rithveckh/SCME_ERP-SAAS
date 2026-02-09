@@ -76,7 +76,7 @@ export default function RevenueDashboard(){
   },[user])
 
   return(
-    <div className="p-10 bg-gray-100 min-h-screen">
+    <div className="p-10 bg-gray-100 min-h-screen text-gray-900">
 
       <div className="flex justify-between mb-8">
         <h1 className="text-3xl font-bold">Revenue Dashboard</h1>
@@ -113,7 +113,7 @@ export default function RevenueDashboard(){
         {payments.map(p=>(
           <div key={p.id} className="border-b py-2">
             <p>Amount: ₹{p.amount}</p>
-            <p>Method: {p.method}</p>
+            <p className="text-green-600">Method: {p.method}</p>
           </div>
         ))}
       </div>
@@ -128,7 +128,7 @@ export default function RevenueDashboard(){
           <div key={b.id} className="border-b py-2">
             <p>Amount: ₹{b.amount}</p>
             <p>Month: {b.month}</p>
-            <p>Status: unpaid</p>
+            <p className="text-red-600">Status: unpaid</p>
           </div>
         ))}
       </div>

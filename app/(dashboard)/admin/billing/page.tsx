@@ -54,21 +54,21 @@ export default function AdminBilling(){
 
   return(
     <div className="p-10">
-      <div className="flex justify-between mb-6">
+      <div className="flex justify-between mb-6 text-gray-900">
         <h1 className="text-3xl font-bold">Billing System</h1>
         <UserButton afterSignOutUrl="/" />
       </div>
 
       <input
-        placeholder="Monthly maintenance amount"
-        className="border p-2 mr-3"
+        placeholder="Enter Monthly maintenance amount"
+        className="border p-2 mr-3 text-gray-900"
         value={amount}
         onChange={(e)=>setAmount(e.target.value)}
       />
 
       <button
         onClick={generateBills}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        className="bg-blue-600 text-white px-4 py-2 rounded text-gray-900"
       >
         Generate Monthly Bills
       </button>

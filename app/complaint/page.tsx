@@ -126,7 +126,7 @@ export default function ComplaintPage() {
   }
 
   return(
-    <div className="p-10">
+    <div className="p-10 bg-gray-100 min-h-screen text-gray-900">
 
       <div className="flex justify-between mb-6">
         <h1 className="text-3xl font-bold">Raise Complaint</h1>

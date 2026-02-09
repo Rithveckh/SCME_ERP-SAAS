@@ -40,7 +40,7 @@ export default function Chatbot({tenant}:{tenant:string}){
 
       {/* chat window */}
       {open && (
-        <div className="fixed bottom-20 right-6 w-80 bg-white shadow-xl rounded-lg p-4">
+        <div className="fixed bottom-20 right-6 w-80 bg-white shadow-xl rounded-lg p-4 text-gray-900">
 
           <h2 className="font-bold mb-2">ERP Assistant</h2>
 
@@ -58,7 +58,7 @@ export default function Chatbot({tenant}:{tenant:string}){
 
           <div className="flex">
             <input
-              className="border flex-1 p-2"
+              className="border flex-1 p-2 text-gray-900"
               placeholder="Ask anything..."
               value={msg}
               onChange={(e)=>setMsg(e.target.value)}

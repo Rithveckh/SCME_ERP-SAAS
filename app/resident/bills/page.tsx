@@ -153,7 +153,7 @@ export default function ResidentBills(){
   }
 
   return(
-    <div className="p-10 bg-gray-100 min-h-screen">
+    <div className="p-10 bg-gray-100 min-h-screen text-gray-900">
 
       <div className="flex justify-between mb-8">
         <h1 className="text-3xl font-bold">My Bills</h1>
@@ -171,7 +171,14 @@ export default function ResidentBills(){
 
           <p className="text-lg"><b>Month:</b> {b.month}</p>
           <p><b>Amount:</b> ₹ {b.amount}</p>
-          <p><b>Status:</b> {b.status}</p>
+          {/* <p ><b>Status:</b> {b.status}</p> */}
+          <p>
+            <b>Status:</b>{" "}
+            <span className={b.status === "unpaid" ? "text-red-500 font-bold" : "text-green-500 font-bold"}>
+              {b.status}
+            </span>
+          </p>
+
 
           <div className="mt-4">
 

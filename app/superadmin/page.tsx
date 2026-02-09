@@ -130,7 +130,7 @@ export default function SuperAdmin(){
   }
 
   return(
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-gray-900">
 
       {/* header */}
       <div className="bg-black text-white p-4 flex justify-between">

@@ -54,7 +54,7 @@ export default function Inventory(){
   }
 
   return(
-    <div className="p-10">
+    <div className="p-10 text-gray-900">
 
       <div className="flex justify-between mb-6">
         <h1 className="text-3xl font-bold">Inventory Management</h1>
@@ -91,11 +91,41 @@ export default function Inventory(){
       <div className="bg-white p-6 rounded shadow">
         <h2 className="font-bold mb-3">Stock</h2>
 
-        {items.map(i=>(
-          <div key={i.id} className="border-b py-2">
+        {/* {items.map(i=>(
+          <div key={i.id} className="border-b py-2 ">
             {i.item_name} — Qty: {i.quantity}
           </div>
-        ))}
+        ))} */}
+        {items.map(item=>{
+
+  const lowStock = item.quantity < 3
+
+  return(
+    <div 
+      key={item.id} 
+      className={`p-4 mb-4 rounded border shadow
+        ${lowStock ? "bg-red-900 border-red-500" : "bg-gray-900 border-gray-700"}
+      `}
+    >
+
+      <p className="text-lg font-semibold text-white">{item.item_name}</p>
+
+      <p className={`text-xl font-bold 
+        ${lowStock ? "text-red-400" : "text-green-400"}
+      `}>
+        Stock: {item.quantity}
+      </p>
+
+      {lowStock && (
+        <p className="text-red-500 font-semibold mt-2">
+          ⚠ Low stock — refill needed
+        </p>
+      )}
+
+    </div>
+  )
+})}
+
       </div>
 
     </div>

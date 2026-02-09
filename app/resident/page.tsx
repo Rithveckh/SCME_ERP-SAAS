@@ -81,7 +81,7 @@ export default function ResidentDashboard(){
   },[user])
 
   return(
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-gray-900">
 
       {/* TOP BAR */}
       <div className="bg-white shadow p-4 flex justify-between items-center">
@@ -135,9 +135,9 @@ export default function ResidentDashboard(){
           </Link>
 
           <Link href="/resident/bills">
-            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
+            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center ">
               <div className="text-4xl mb-3">💳</div>
-              <h2 className="text-xl font-bold">My Bills</h2>
+              <h2 className="text-xl  font-bold ">My Bills</h2>
               <p className="text-gray-500">View & pay maintenance</p>
             </div>
           </Link>
