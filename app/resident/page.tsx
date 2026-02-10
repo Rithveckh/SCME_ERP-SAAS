@@ -150,6 +150,22 @@ export default function ResidentDashboard(){
             </div>
           </Link>
 
+          <Link href="/resident/visitors">
+            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
+              <div className="text-4xl mb-3">👥</div>
+              <h2 className="text-xl font-bold">Visitors</h2>
+              <p className="text-gray-500">Manage visitors</p>
+            </div>
+          </Link>
+
+          <Link href="/resident/facility">
+            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
+              <div className="text-4xl mb-3">🏋️</div>
+              <h2 className="text-xl font-bold">Facility Booking</h2>
+              <p className="text-gray-500">Book facilities</p>
+            </div>
+          </Link>
+
         </div>
 
       </div>

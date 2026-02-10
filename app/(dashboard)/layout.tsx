@@ -79,6 +79,8 @@ export default function DashboardLayout({
           <Link href="/admin/revenue" className="block hover:text-blue-400">Revenue</Link>
           <Link href="/admin/vendors" className="block hover:text-blue-400">Vendors</Link>
           <Link href="/admin/inventory" className="block hover:text-blue-400">Inventory</Link>
+          <Link href="/security" className="block hover:text-blue-400">Security</Link>
+          <Link href="/admin/facility" className="block hover:text-blue-400">Facility Booking</Link>
         </nav>
       </div>
 

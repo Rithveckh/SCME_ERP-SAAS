@@ -841,8 +841,12 @@ import {
   ResponsiveContainer
 } from "recharts"
 import Chatbot from "@/app/components/Chatbot"
+import { useSearchParams } from "next/navigation"
 
 export default function AdminDashboard(){
+
+  const searchParams = useSearchParams()
+  const overrideTenant = searchParams.get("tenant")
 
   const { user } = useUser()
 
@@ -864,15 +868,34 @@ export default function AdminDashboard(){
 
     const load = async()=>{
 
+    let tenantId = null
+        // 🟣 If super admin opened specific apartment
+    if(overrideTenant){
+      tenantId = overrideTenant
+    }
+
+    // 🔵 Normal admin login
+    else{
       const { data:userData } = await supabase
         .from("users")
         .select("*")
         .eq("clerk_id", user.id)
         .single()
 
-      if(!userData?.tenant_id) return
-      const tenantId=userData.tenant_id
-      setTenant(tenantId)
+      tenantId = userData?.tenant_id
+    }
+
+    if(!tenantId) return
+
+      // const { data:userData } = await supabase
+      //   .from("users")
+      //   .select("*")
+      //   .eq("clerk_id", user.id)
+      //   .single()
+
+      // if(!userData?.tenant_id) return
+      // const tenantId = overrideTenant || userData.tenant_id
+      // setTenant(tenantId)
 
       // residents
       const { count:residents } = await supabase
@@ -1022,7 +1045,7 @@ export default function AdminDashboard(){
   },[user])
 
   return(
-    <div>
+    <div >
 
       <h1 className="text-3xl font-bold mb-6 text-gray-900">🚀 Smart Admin Dashboard</h1>
 
