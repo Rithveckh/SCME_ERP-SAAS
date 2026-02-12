@@ -1,32 +1,11 @@
-// "use client"
-// import Link from "next/link"
-// import { UserButton } from "@clerk/nextjs"
-
-// export default function ResidentDashboard(){
-//   return(
-//     <div className="p-10">
-//       <div className="flex justify-between">
-//         <h1 className="text-3xl font-bold">Resident Dashboard</h1>
-//         <UserButton afterSignOutUrl="/" />
-//       </div>
-
-//       <div className="mt-6">
-//         <Link href="/complaint">
-//           <button className="bg-green-600 text-white px-5 py-2 rounded">
-//             Raise Complaint
-//           </button>
-//         </Link>
-//       </div>
-//     </div>
-//   )
-// }
-
 "use client"
 
 import Link from "next/link"
 import { UserButton, useUser } from "@clerk/nextjs"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
+import ResidentAI from "@/app/components/ResidentAI"
+import ResidentID from "@/app/components/ResidentID"
 
 export default function ResidentDashboard(){
 
@@ -50,6 +29,21 @@ export default function ResidentDashboard(){
         .single()
 
       if(!userData) return
+
+      // 🟢 create wallet if not exists
+      const { data:existingWallet } = await supabase
+        .from("wallets")
+        .select("*")
+        .eq("user_id", userData.id)
+        .maybeSingle()
+
+      if(!existingWallet){
+        await supabase.from("wallets").insert([{
+          user_id:userData.id,
+          tenant_id:userData.tenant_id,
+          balance:0
+        }])
+      }
 
       // complaints
       const { data:complaints } = await supabase
@@ -92,11 +86,28 @@ export default function ResidentDashboard(){
       <div className="p-8">
 
         {/* welcome */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-xl shadow mb-8">
-          <h2 className="text-2xl font-bold">
-            Welcome {user?.fullName}
-          </h2>
-          <p className="opacity-90">Smart Community ERP Portal</p>
+        {/* HERO SECTION WITH DIGITAL ID */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+
+          {/* welcome banner */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-xl shadow flex flex-col justify-center">
+            <h2 className="text-3xl font-bold mb-2">
+              Welcome {user?.fullName}
+            </h2>
+            <p className="opacity-90 text-lg">
+              Smart Community ERP Portal
+            </p>
+
+            <p className="mt-4 opacity-80 text-sm">
+              Manage visitors • Bills • Complaints • Facilities
+            </p>
+          </div>
+
+          {/* 🪪 DIGITAL ID RIGHT SIDE */}
+          <div className="flex justify-center md:justify-end">
+            <ResidentID />
+          </div>
+
         </div>
 
         {/* stat cards */}
@@ -142,6 +153,22 @@ export default function ResidentDashboard(){
             </div>
           </Link>
 
+          <Link href="/resident/wallet">
+            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
+              <div className="text-4xl mb-3">💰</div>
+              <h2 className="text-xl font-bold">My Wallet</h2>
+              <p className="text-gray-500">Manage wallet balance</p>
+            </div>
+          </Link>
+
+          <Link href="/resident/marketplace">
+            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
+              <div className="text-4xl mb-3">🛒</div>
+              <h2 className="text-xl font-bold">Marketplace</h2>
+              <p className="text-gray-500">Buy services from vendors</p>
+            </div>
+          </Link>
+
           <Link href="/resident/history">
             <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
               <div className="text-4xl mb-3">📜</div>
@@ -158,6 +185,14 @@ export default function ResidentDashboard(){
             </div>
           </Link>
 
+          <Link href="/resident/community">
+            <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
+              <div className="text-4xl mb-3">🏘</div>
+              <h2 className="text-xl font-bold">Community</h2>
+              <p className="text-gray-500">Community posts</p>
+            </div>
+          </Link>
+
           <Link href="/resident/facility">
             <div className="bg-white p-8 rounded-xl shadow hover:shadow-xl cursor-pointer text-center">
               <div className="text-4xl mb-3">🏋️</div>
@@ -169,6 +204,7 @@ export default function ResidentDashboard(){
         </div>
 
       </div>
+      <ResidentAI />
     </div>
   )
 }

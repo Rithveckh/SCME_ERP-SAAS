@@ -9,7 +9,20 @@ const supabase = createClient(
 export async function POST(req:Request){
  try{
 
-  const { actionId } = await req.json()
+  // const { actionId } = await req.json()
+  
+  // 🟢 SAFE JSON PARSE
+  let body:any = {}
+  try{
+    body = await req.json()
+  }catch{
+    body = {}
+  }
+
+  const actionId = body?.actionId
+  if(!actionId){
+    return NextResponse.json({ok:true})
+  }
 
   const { data:action } = await supabase
     .from("ai_actions")

@@ -31,6 +31,10 @@ export default function AdminDashboard(){
   const [aiInsights,setAiInsights]=useState<string[]>([])
   const [aiDecision,setAiDecision]=useState<string[]>([])
   const [aiManager,setAiManager]=useState<string[]>([])
+  const [performance,setPerformance]=useState<any[]>([])
+  const [health,setHealth]=useState<any>(null)
+
+
 
   useEffect(()=>{
     // 🔥 RUN AI ENGINE
@@ -58,6 +62,29 @@ export default function AdminDashboard(){
 
       if(!tenantId) return
       setTenant(tenantId)
+
+      /* =====================================================
+      💰 SaaS SUBSCRIPTION CHECK
+      ===================================================== */
+
+      const { data:sub } = await supabase
+        .from("tenant_subscriptions")
+        .select("*,subscription_plans(name)")
+        .eq("tenant_id", tenantId)
+        .eq("status","active")
+        .maybeSingle()
+
+      // no subscription
+      if(!sub){
+        alert("⚠ No active subscription for this apartment.\nContact Super Admin.")
+        return
+      }
+
+      // expired
+      if(sub.end_date && new Date(sub.end_date) < new Date()){
+        alert("⚠ Subscription expired.\nRenew plan to continue.")
+        return
+      }
 
       await fetch("/api/ai-executor",{
       method:"POST",
@@ -125,6 +152,54 @@ export default function AdminDashboard(){
       }))
 
       setRevenueChart(arr)
+
+    /* =====================================================
+      🧠 APARTMENT HEALTH SCORE AI
+    ===================================================== */
+
+    let pendingComplaints =
+      complaints?.filter(c=>c.status!=="completed").length || 0
+
+    let totalComplaints = complaints?.length || 0
+
+    // base score
+    let score = 100
+
+    // complaints reduce score
+    score -= pendingComplaints * 5
+    score -= totalComplaints * 1
+
+    // revenue improves score
+    if(revenue > 20000) score += 10
+    if(revenue < 5000) score -= 10
+
+    // limits
+    if(score>100) score=100
+    if(score<0) score=0
+
+    // health status
+    let healthStatus="🟢 Excellent"
+    if(score<80) healthStatus="🟡 Warning"
+    if(score<50) healthStatus="🔴 Critical"
+
+    // store in DB
+    await supabase
+    .from("apartment_health")
+    .upsert([{
+      tenant_id:tenantId,
+      health_score:score,
+      status:healthStatus,
+      complaints:totalComplaints,
+      revenue:revenue,
+      pending:pendingComplaints,
+      updated_at:new Date()
+    }])
+
+          // set to UI
+          setHealth({
+            score,
+            status:healthStatus
+      })
 
       // =============================
       // 🤖 PREDICTIVE AI
@@ -228,23 +303,6 @@ export default function AdminDashboard(){
     setAiManager(manager)
 
     // 🔥 STORE AI DECISIONS INTO DB (NO DUPLICATES)
-    // for(const m of manager){
-
-    //   await supabase
-    //     .from("ai_actions")
-    //     .insert([{
-    //       tenant_id: tenantId,
-    //       action: m,
-    //       priority: m.includes("⚠️") ? "high" :
-    //                 m.includes("📦") ? "medium" :
-    //                 "low"
-    //     }])
-
-    // }
-  // ===========================
-  // 🧠 STORE AI ACTIONS 
-  // ===========================
-
   for(const actionText of manager){
 
     // 🔴 check if already exists and still pending
@@ -272,6 +330,60 @@ export default function AdminDashboard(){
 
     }
   }
+
+
+  /* =====================================================
+   🏆 STAFF PERFORMANCE AI ENGINE
+===================================================== */
+
+const { data:staffList } = await supabase
+  .from("users")
+  .select("*")
+  .eq("tenant_id",tenantId)
+  .eq("role","staff")
+
+for(const s of staffList || []){
+
+  // completed tasks
+  const { count:completed } = await supabase
+    .from("complaints")
+    .select("*",{count:"exact",head:true})
+    .eq("assigned_staff",s.id)
+    .eq("status","completed")
+
+  // attendance
+  const { count:attendance } = await supabase
+    .from("staff_attendance")
+    .select("*",{count:"exact",head:true})
+    .eq("staff_id",s.id)
+
+  // score formula
+  const score = (completed||0)*10 + (attendance||0)*2
+
+  let remark="Average"
+  if(score>80) remark="🏆 Excellent performer"
+  if(score<20) remark="⚠️ Needs improvement"
+
+  await supabase.from("staff_performance").upsert([{
+    tenant_id:tenantId,
+    staff_id:s.id,
+    tasks_completed:completed||0,
+    attendance_days:attendance||0,
+    performance_score:score,
+    remark
+  }])
+}
+
+/* ===== FETCH PERFORMANCE TABLE ===== */
+
+const { data:perf } = await supabase
+  .from("staff_performance")
+  .select("*,users(name)")
+  .eq("tenant_id",tenantId)
+  .order("performance_score",{ascending:false})
+
+setPerformance(perf||[])
+
 
     }
     
@@ -307,6 +419,15 @@ export default function AdminDashboard(){
         </div>
 
       </div>
+
+      {/* 🧠 HEALTH SCORE CARD */}
+      {health && (
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 rounded-xl shadow mb-8">
+          <h2 className="text-xl font-bold">🏥 Apartment Health Score</h2>
+          <p className="text-4xl font-bold mt-2">{health.score}%</p>
+          <p className="text-lg mt-1">{health.status}</p>
+        </div>
+      )}
 
       {/* charts */}
       <div className="grid md:grid-cols-2 gap-8">
@@ -356,6 +477,41 @@ export default function AdminDashboard(){
         <h2 className="text-xl font-bold mb-4">🧠 Self-Running AI Manager</h2>
         {aiManager.map((m,index)=>(<p key={index}>{m}</p>))}
       </div>
+
+      {/* 🏆 STAFF PERFORMANCE */}
+<div className="bg-white p-6 rounded-xl shadow mt-10">
+  <h2 className="text-xl font-bold mb-4">
+    🏆 Staff Performance Leaderboard
+  </h2>
+
+  {performance.length===0 && (
+    <p className="text-gray-500">No staff performance data</p>
+  )}
+
+  {performance.map((p,index)=>(
+    <div key={p.id}
+      className="flex justify-between border-b py-3">
+
+      <div>
+        <p className="font-bold">
+          #{index+1} {p.users?.name || "Staff"}
+        </p>
+        <p className="text-sm text-gray-500">
+          Tasks: {p.tasks_completed} | Attendance: {p.attendance_days}
+        </p>
+      </div>
+
+      <div className="text-right">
+        <p className="font-bold text-purple-600">
+          Score: {p.performance_score}
+        </p>
+        <p>{p.remark}</p>
+      </div>
+
+    </div>
+  ))}
+</div>
+
 
       {/* chatbot */}
       <Chatbot tenant={tenant}/>

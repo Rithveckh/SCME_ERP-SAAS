@@ -23,36 +23,8 @@ export default function DashboardLayout({
   document.documentElement.classList.toggle("dark")
 }
 
-  // const menu = [
-  //   { name: "Dashboard", link: "/admin" },
-  //   { name: "Complaints", link: "/admin/complaints" },
-  //   { name: "Billing", link: "/admin/billing" },
-  //   { name: "Revenue", link: "/admin/revenue" },
-  //   { name: "Inventory", link: "/admin/inventory" },
-  // ]
-
   return (
     <div className="flex h-screen bg-gray-100">
-
-      {/* SIDEBAR
-      <div className="w-64 bg-black text-white flex flex-col">
-
-        <div className="p-5 text-xl font-bold border-b border-gray-700">
-          SCME ERP
-        </div>
-
-        <div className="flex-1 p-4 space-y-2">
-          {menu.map((m)=>(
-            <Link key={m.link} href={m.link}>
-              <div className={`p-3 rounded cursor-pointer ${
-                path===m.link ? "bg-gray-800" : "hover:bg-gray-900"
-              }`}>
-                {m.name}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div> */}
 
       {/* 🔴 OVERLAY (mobile only) */}
       {open && (
@@ -77,7 +49,6 @@ export default function DashboardLayout({
           <Link href="/admin/complaints" className="block hover:text-blue-400">Complaints</Link>
           <Link href="/admin/billing" className="block hover:text-blue-400">Billing</Link>
           <Link href="/admin/revenue" className="block hover:text-blue-400">Revenue</Link>
-          <Link href="/admin/vendors" className="block hover:text-blue-400">Vendors</Link>
           <Link href="/admin/inventory" className="block hover:text-blue-400">Inventory</Link>
           <Link href="/security" className="block hover:text-blue-400">Security</Link>
           <Link href="/admin/facility" className="block hover:text-blue-400">Facility Booking</Link>

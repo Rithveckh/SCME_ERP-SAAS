@@ -1,157 +1,3 @@
-// "use client"
-// import { useEffect, useState } from "react"
-// import { supabase } from "@/lib/supabase"
-// import { useUser } from "@clerk/nextjs"
-
-// export default function StaffDashboard(){
-//   const { user } = useUser()
-//   const [tasks,setTasks]=useState<any[]>([])
-
-//   useEffect(()=>{
-//     if(!user) return
-
-//     const load=async()=>{
-//       const { data:userData } = await supabase
-//         .from("users")
-//         .select("*")
-//         .eq("clerk_id", user.id)
-//         .single()
-
-//       if(!userData) return
-
-//       const { data } = await supabase
-//         .from("complaints")
-//         .select("*")
-//         .eq("assigned_staff", userData.id)
-
-//       setTasks(data || [])
-//     }
-
-//     load()
-//   },[user])
-
-//   return(
-//     <div className="p-10">
-//       <h1 className="text-3xl font-bold mb-6">Staff Tasks</h1>
-
-//       {tasks.map(t=>(
-//         <div key={t.id} className="border p-4 mb-3">
-//           <p>{t.category}</p>
-//           <p>{t.description}</p>
-//           <p>Status: {t.status}</p>
-//         </div>
-//       ))}
-//     </div>
-//   )
-// }
-
-
-
-// "use client"
-
-// import { useEffect, useState } from "react"
-// import { supabase } from "@/lib/supabase"
-// import { useUser, UserButton } from "@clerk/nextjs"
-
-// export default function StaffDashboard(){
-
-//   const { user } = useUser()
-//   const [tasks,setTasks]=useState<any[]>([])
-//   const [items,setItems]=useState<any[]>([])
-
-//   useEffect(()=>{
-//     if(!user) return
-
-//     const load=async()=>{
-//       const { data:userData } = await supabase
-//         .from("users")
-//         .select("*")
-//         .eq("clerk_id", user.id)
-//         .single()
-
-//       const { data:taskData } = await supabase
-//         .from("complaints")
-//         .select("*")
-//         .eq("assigned_staff", userData.id)
-
-//       setTasks(taskData || [])
-
-//       const { data:itemData } = await supabase
-//         .from("inventory")
-//         .select("*")
-//         .eq("tenant_id", userData.tenant_id)
-
-//       setItems(itemData || [])
-//     }
-
-//     load()
-//   },[user])
-
-//   const useItem = async(item:any)=>{
-//     const qty = prompt("Enter quantity used")
-//     if(!qty) return
-
-//     const newQty = item.quantity - Number(qty)
-//     if(newQty < 0) return alert("Not enough stock")
-
-//     const { data:userData } = await supabase
-//       .from("users")
-//       .select("*")
-//       .eq("clerk_id", user?.id)
-//       .single()
-
-//     // update stock
-//     await supabase
-//       .from("inventory")
-//       .update({quantity:newQty})
-//       .eq("id",item.id)
-
-//     // log usage
-//     await supabase.from("usage_logs").insert([{
-//       tenant_id:userData.tenant_id,
-//       staff_id:userData.id,
-//       item_id:item.id,
-//       quantity_used:Number(qty)
-//     }])
-
-//     alert("Stock updated")
-//     location.reload()
-//   }
-
-//   return(
-//     <div className="p-10">
-
-//       <div className="flex justify-between mb-6">
-//         <h1 className="text-3xl font-bold">Staff Dashboard</h1>
-//         <UserButton afterSignOutUrl="/" />
-//       </div>
-
-//       <h2 className="font-bold mb-3">Assigned Tasks</h2>
-//       {tasks.map(t=>(
-//         <div key={t.id} className="border p-3 mb-3">
-//           {t.category} — {t.description}
-//         </div>
-//       ))}
-
-//       <h2 className="font-bold mt-8 mb-3">Use Materials</h2>
-
-//       {items.map(i=>(
-//         <div key={i.id} className="border p-3 mb-2">
-//           {i.item_name} — Qty: {i.quantity}
-
-//           <button
-//             onClick={()=>useItem(i)}
-//             className="bg-red-600 text-white px-3 py-1 ml-4"
-//           >
-//             Use
-//           </button>
-//         </div>
-//       ))}
-//     </div>
-//   )
-// }
-
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -244,6 +90,95 @@ export default function StaffDashboard(){
     location.reload()
   }
 
+  const updateStatus = async(id:string,status:string)=>{
+  await supabase
+    .from("complaints")
+    .update({status})
+    .eq("id",id)
+
+  alert("Updated")
+  location.reload()
+}
+
+const checkIn = async()=>{
+  if(!user) return
+
+  const { data:userData } = await supabase
+    .from("users")
+    .select("*")
+    .eq("clerk_id", user.id)
+    .single()
+
+  if(!userData) return alert("User not found")
+
+  // prevent double check-in
+  const today = new Date().toISOString().split("T")[0]
+
+  const { data:existing } = await supabase
+    .from("staff_attendance")
+    .select("*")
+    .eq("staff_id",userData.id)
+    .eq("date",today)
+    .single()
+
+  if(existing){
+    alert("Already checked in today")
+    return
+  }
+
+  await supabase.from("staff_attendance").insert([{
+    tenant_id:userData.tenant_id,
+    staff_id:userData.id,
+    date:today,
+    check_in:new Date(),
+    status:"present"
+  }])
+
+  alert("✅ Checked in successfully")
+}
+
+
+const checkOut = async()=>{
+  if(!user) return
+
+  const { data:userData } = await supabase
+    .from("users")
+    .select("*")
+    .eq("clerk_id", user.id)
+    .single()
+
+  if(!userData) return
+
+  const today = new Date().toISOString().split("T")[0]
+
+  const { data } = await supabase
+    .from("staff_attendance")
+    .select("*")
+    .eq("staff_id",userData.id)
+    .eq("date",today)
+    .single()
+
+  if(!data){
+    alert("You didn't check in today")
+    return
+  }
+
+  if(data.check_out){
+    alert("Already checked out")
+    return
+  }
+
+  await supabase
+    .from("staff_attendance")
+    .update({
+      check_out:new Date()
+    })
+    .eq("id",data.id)
+
+  alert("👋 Checked out successfully")
+}
+
+
   return(
     <div className="min-h-screen bg-gray-100 text-gray-900">
 
@@ -256,12 +191,31 @@ export default function StaffDashboard(){
       <div className="p-8">
 
         {/* welcome */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 rounded-xl shadow mb-8">
+        <div className="bg-linear-to-r from-orange-500 to-red-500 text-white p-6 rounded-xl shadow mb-8">
           <h2 className="text-2xl font-bold">
             Welcome {user?.fullName}
           </h2>
           <p className="opacity-90">Assigned Maintenance Tasks</p>
         </div>
+
+      {/* attendance buttons */}
+      <div className="flex gap-4 mb-8">
+
+        <button
+          onClick={checkIn}
+          className="bg-green-600 text-white px-6 py-3 rounded-lg shadow"
+        >
+          🟢 Check In
+        </button>
+
+        <button
+          onClick={checkOut}
+          className="bg-red-600 text-white px-6 py-3 rounded-lg shadow"
+        >
+          🔴 Check Out
+        </button>
+
+      </div>
 
         {/* stats */}
         <div className="grid grid-cols-3 gap-6 mb-10">
@@ -299,6 +253,29 @@ export default function StaffDashboard(){
               <p className="font-bold">{t.category}</p>
               <p className="text-gray-600">{t.description}</p>
               <p>Status: <b>{t.status}</b></p>
+
+<div className="flex gap-3 mt-2">
+
+  {t.status==="pending" && (
+    <button
+      onClick={()=>updateStatus(t.id,"in_progress")}
+      className="bg-blue-600 text-white px-3 py-1 rounded"
+    >
+      Start Work
+    </button>
+  )}
+
+  {t.status!=="completed" && (
+    <button
+      onClick={()=>updateStatus(t.id,"completed")}
+      className="bg-green-600 text-white px-3 py-1 rounded"
+    >
+      Mark Completed
+    </button>
+  )}
+
+</div>
+
 
             </div>
           ))}
