@@ -2,7 +2,7 @@
 
 SCME-ERP is a **cloud-based Enterprise Resource Planning (ERP)** system for **Residential Communities**, built as a **multi-role SaaS platform** with real-world modules such as billing, service requests, inventory, staff, vendors, and **automated PDF invoicing**.
 
-🔗 **Live Demo:** https://scme-erp.vercel.app
+🔗 **Live Demo:** https://scme-erp-saas.vercel.app/
 
 ---
 
